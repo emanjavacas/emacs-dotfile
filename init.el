@@ -489,9 +489,9 @@ file of a buffer in an external program."
       (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\"")
     s))
 
-(defun jekyll-draft-post (title)
+(defun jekyll-draft-post (jekyll-directory title)
   "Create a new Jekyll blog post."
-  (interactive "sPost Title: ")
+  (interactive "sTarget dir (dir with .org files): \nsPost Title: ")
   (let ((draft-file (concat jekyll-directory jekyll-drafts-dir
 			    (jekyll-make-slug title)
 			    jekyll-post-ext)))
@@ -500,9 +500,9 @@ file of a buffer in an external program."
       (find-file draft-file)
       (insert (format jekyll-post-template (jekyll-yaml-escape title))))))
 
-(defun jekyll-publish-post ()
+(defun jekyll-publish-post (jekyll-directory)
   "Move a draft post to the posts directory, and rename it so that it contains the date."
-  (interactive)
+  (interactive "sTarget dir (dir with .org files: ")
   (cond
    ((not (equal
 	  (file-name-directory (buffer-file-name (current-buffer)))

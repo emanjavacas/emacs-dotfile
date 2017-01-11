@@ -390,7 +390,8 @@ file of a buffer in an external program."
 (elpy-enable)
 (elpy-use-ipython)
 (setq python-remove-cwd-from-path nil)
-(setq python-shell-interpreter "/home/enrique/.pyenv/shims/ipython")
+(setq python-shell-interpreter "/home/enrique/.pyenv/shims/ipython"
+      python-shell-interpreter-args "--simple-prompt -i")
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Org-Mode
@@ -400,23 +401,52 @@ file of a buffer in an external program."
 (add-to-list 'org-structure-template-alist '("n" "#+begin_notes\n?\n#+end_notes"))
 (add-to-list 'org-structure-template-alist '("r" "#+attr_reveal: :"))
 
+;;; Presentations
 (require 'ox-reveal)
 (setq org-reveal-root "file:///home/enrique/.emacs.d/lisp/reveal.js-3.1.0/")
 (add-to-list 'load-path "~/.emacs.d/lisp/org-html5presentation.el")
 (require 'ox-html5presentation)
 
+;;; org-jekyll
+(require 'org2jekyll)
+
+(setq org-publish-project-alist
+      '(
+	("interstylar-src"
+	 ;; Path to your org files.
+	 :base-directory (expand-file-name "~/Documents/interstylar/org/")
+	 :base-extension "org"
+
+	 ;; Path to your Jekyll project.
+	 :publishing-directory (expand-file-name "~/Documents/interstylar/jekyll/")
+	 :recursive t
+	 :publishing-function org-publish-org-to-html
+	 :headline-levels 4 
+	 :html-extension "html"
+	 :body-only t ;; Only export section between <body> </body>
+	 )
+
+	("interstylar-static"
+	 :base-directory "~/Documents/interstylar/org/"
+	 :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|php"
+	 :publishing-directory "~/Documents/interstylar/"
+	 :recursive t
+	 :publishing-function org-publish-attachment)
+
+	("interstylar" :components ("interstylar-src" "interstylar-static"))
+	)
+      )
+
 ;;;;;;;;;;;;;;;;;;;;
-;; ORG-BABEL
+;;; ORG-BABEL
+
 ;;; fontify source code
 (require 'ox-latex)
 ;; Add minted to the defaults packages to include when exporting.
 (add-to-list 'org-latex-packages-alist '("" "minted"))
-;; Tell the latex export to use the minted package for source
-;; code coloration.
+;; Tell the latex export to use the minted package for source code coloration.
 (setq org-latex-listings 'minted)
-;; Let the exporter use the -shell-escape option to let latex
-;; execute external programs.
-;; This obviously and can be dangerous to activate!
+;; Let the exporter use the -shell-escape option to let latex execute external programs.
 (setq org-latex-pdf-process
       '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -bibtex %f %f"
 	"latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -bibtex %f %f"))
@@ -426,7 +456,7 @@ file of a buffer in an external program."
 	("fontsize" "\\small")
 	("linenos" "")))
 
-;; Show syntax highlighting per language native mode in *.org
+;;; Show syntax highlighting per language native mode in *.org
 (setq org-src-fontify-natively t)
 ;;; smart quotes
 (setq org-export-with-smart-quotes t)
@@ -436,7 +466,7 @@ file of a buffer in an external program."
 (setq org-confirm-babel-evaluate nil)
 ;;; don't evaluate when exporting
 (setq org-export-babel-evaluate nil)
-;; For languages with significant whitespace like Python:
+;;; For languages with significant whitespace like Python:
 (setq org-src-preserve-indentation t)
 
 (defvar my/org-babel-evaluated-languages
@@ -452,7 +482,7 @@ file of a buffer in an external program."
 (require 'ob-clojure)
 (setq org-babel-clojure-backend 'cider)
 
-;; Diagramming
+;;; Diagramming
 (add-to-list 'org-src-lang-modes (quote ("dot" . graphviz-dot)))
 (add-to-list 'my/org-babel-evaluated-languages 'dot)
 (add-to-list 'my/org-babel-evaluated-languages 'plantuml)
@@ -468,7 +498,7 @@ file of a buffer in an external program."
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; LATEX
-;; AucTeX
+;;; AucTeX
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)
 (setq-default TeX-master nil)

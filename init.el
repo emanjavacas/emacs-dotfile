@@ -415,35 +415,35 @@ file of a buffer in an external program."
       '(
         ;; blog directory
 	("org-quique"
-         :base-directory (expand-file-name "blog/org/") 
-         :base-extension "org" 
-         :publishing-directory (expand-file-name "blog/emanjavacas.github.io/")
+         :base-directory "~/blog/org/"
+         :base-extension "org"
+         :publishing-directory "~/blog/emanjavacas.github.io/"
          :recursive t
          :publishing-function org-html-publish-to-html 
          :headline-levels 4
          :html-extension "html"
          :body-only t)  ;; Only export section between <body> </body>
         ("org-static-quique"
-         :base-directory (expand-file-name "blog/org/") 
+         :base-directory "~/blog/org/" 
          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|php" 
-         :publishing-directory (expand-file-name "blog/emanjavacas.github.io/") 
+         :publishing-directory "~/blog/emanjavacas.github.io/" 
          :recursive t
          :publishing-function org-publish-attachment)
         ("blog" :components ("org-quique" "org-static-quique"))
         ;; interstylar directory
         ("interstylar-src"
-         :base-directory (expand-file-name "Documents/interstylar/org") 
+         :base-directory "~/Documents/interstylar/org/" 
          :base-extension "org" 
-         :publishing-directory (expand-file-name "Documents/interstylar/jekyll")
+         :publishing-directory "~/Documents/interstylar/jekyll/"
          :recursive t
          :publishing-function org-html-publish-to-html 
          :headline-levels 4
          :html-extension "html"
          :body-only t)  ;; Only export section between <body> </body>
         ("interstylar-static"
-         :base-directory (expand-file-name "Documents/interstylar/jekyll")
+         :base-directory "~/Documents/interstylar/jekyll/"
          :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|php" 
-         :publishing-directory (expand-file-name "Documents/interstylar/jekyll") 
+         :publishing-directory "~/Documents/interstylar/jekyll/" 
          :recursive t
          :publishing-function org-publish-attachment)
         ("interstylar" :components ("interstylar-src" "interstylar-static"))))
@@ -459,7 +459,7 @@ file of a buffer in an external program."
 ;; then need to html-export it to the jekyll rootdir (with org-publish).
 
 (global-set-key (kbd "C-c J n") 'jekyll-draft-post)
-(global-set-key (kbd "C-c J P") 'jekyll-publish-post)
+(global-set-key (kbd "C-c J Q") 'jekyll-publish-post)
 
 ;; this should be defined interactively
 ;; (defvar jekyll-directory "/Users/quique/blog/org/"
@@ -467,14 +467,11 @@ file of a buffer in an external program."
 
 (defvar jekyll-drafts-dir "_drafts/"
   "Relative path to drafts directory.")
-(defvar jekyll-posts-dir "_posts/"
-  "Relative path to posts directory.")
 (defvar jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 (defvar jekyll-post-template
-  "#+STARTUP: showall\n#+STARTUP: hidestars\n
-   #+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t\n
-   #+BEGIN_HTML\n---\nlayout: post\ncomments: true\ntitle: %s\ntags: \n---\n#+END_HTML\n\n "
+  "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
+#+BEGIN_HTML\n---\nlayout: category\ntitle: %s\ndescription: %s\n---\n#+END_HTML\n\n"
   "Default template for Jekyll posts. %s will be replace by the post title.")
 
 (defun jekyll-make-slug (s)
@@ -491,38 +488,44 @@ file of a buffer in an external program."
       (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\"")
     s))
 
-(defun jekyll-draft-post (jekyll-directory title)
+(defun jekyll-draft-post (jekyll-directory title description)
   "Create a new Jekyll blog post."
-  (interactive "sTarget dir (dir with .org files): \nsPost Title: ")
+  (interactive
+   (list (read-file-name "Target project directory: ")
+	 (read-string "Post Title: ")
+	 (read-string "Post Description: ")))
   (let ((draft-file (concat jekyll-directory jekyll-drafts-dir
 			    (jekyll-make-slug title)
 			    jekyll-post-ext)))
     (if (file-exists-p draft-file)
 	(find-file draft-file)
       (find-file draft-file)
-      (insert (format jekyll-post-template (jekyll-yaml-escape title))))))
+      (insert (format jekyll-post-template (jekyll-yaml-escape title) description)))))
 
-(defun jekyll-publish-post (jekyll-directory)
+(defun jekyll-publish-post (target-directory)
   "Move a draft post to the posts directory, and rename it so that it contains the date."
-  (interactive "sTarget dir (dir with .org files: ")
+  (interactive
+   (list (read-file-name "Post target directory: ")))
   (cond
-   ((not (equal
-	  (file-name-directory (buffer-file-name (current-buffer)))
-	  (concat jekyll-directory jekyll-drafts-dir)))
-    (message "This is not a draft post.")
+   ((equal
+     (file-name-directory (buffer-file-name (current-buffer)))
+     target-directory)
+    (message "Target directory can't be drafts directory [%s]"
+	     (file-name-directory (buffer-file-name (current-buffer))))
     (insert (file-name-directory (buffer-file-name (current-buffer))) "\n"
-	    (concat jekyll-directory jekyll-drafts-dir)))
+	    target-directory))
    ((buffer-modified-p)
     (message "Can't publish post; buffer has modifications."))
    (t
     (let ((filename
-	   (concat jekyll-directory jekyll-posts-dir
+	   (concat target-directory
 		   (format-time-string "%Y-%m-%d-")
 		   (file-name-nondirectory
 		    (buffer-file-name (current-buffer)))))
 	  (old-point (point)))
-      (rename-file (buffer-file-name (current-buffer))
-		   filename)
+      (if (not (file-exists-p (file-name-directory filename)))
+	  (make-directory (file-name-directory filename)))
+      (rename-file (buffer-file-name (current-buffer)) filename)
       (kill-buffer nil)
       (find-file filename)
       (set-window-point (selected-window) old-point)))))

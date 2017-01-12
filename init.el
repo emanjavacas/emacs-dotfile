@@ -438,7 +438,7 @@ file of a buffer in an external program."
          :recursive t
          :publishing-function org-html-publish-to-html 
          :headline-levels 4
-         :html-extension "html"
+         :html-extension "markdown"
          :body-only t)  ;; Only export section between <body> </body>
         ("interstylar-static"
          :base-directory "~/Documents/interstylar/jekyll/"
@@ -461,17 +461,19 @@ file of a buffer in an external program."
 (global-set-key (kbd "C-c J n") 'jekyll-draft-post)
 (global-set-key (kbd "C-c J Q") 'jekyll-publish-post)
 
-;; this should be defined interactively
-;; (defvar jekyll-directory "/Users/quique/blog/org/"
-;;   "Path to Jekyll blog.")
+(global-set-key (kbd "C-c J t") 'insert-jekyll-date)
+
+(defun insert-jekyll-date ()
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
 
 (defvar jekyll-drafts-dir "_drafts/"
   "Relative path to drafts directory.")
 (defvar jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 (defvar jekyll-post-template
-  "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
-#+BEGIN_HTML\n---\nlayout: category\ntitle: %s\ndescription: %s\n---\n#+END_HTML\n\n"
+  "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+BEGIN_HTML\n---\nlayout: post\ntitle: %s\ndescription: %s\ndate: %s\n---\n#+END_HTML\n\n"
   "Default template for Jekyll posts. %s will be replace by the post title.")
 
 (defun jekyll-make-slug (s)
@@ -491,21 +493,22 @@ file of a buffer in an external program."
 (defun jekyll-draft-post (jekyll-directory title description)
   "Create a new Jekyll blog post."
   (interactive
-   (list (read-file-name "Target project directory: ")
+   (list (read-directory-name "Target project directory: ")
 	 (read-string "Post Title: ")
 	 (read-string "Post Description: ")))
   (let ((draft-file (concat jekyll-directory jekyll-drafts-dir
 			    (jekyll-make-slug title)
-			    jekyll-post-ext)))
+			    jekyll-post-ext))
+	(current-time (format-time-string "%Y-%m-%d %H:%M:%S")))
     (if (file-exists-p draft-file)
 	(find-file draft-file)
       (find-file draft-file)
-      (insert (format jekyll-post-template (jekyll-yaml-escape title) description)))))
+      (insert (format jekyll-post-template (jekyll-yaml-escape title) description current-time)))))
 
 (defun jekyll-publish-post (target-directory)
   "Move a draft post to the posts directory, and rename it so that it contains the date."
   (interactive
-   (list (read-file-name "Post target directory: ")))
+   (list (read-directory-name "Post target directory: ")))
   (cond
    ((equal
      (file-name-directory (buffer-file-name (current-buffer)))

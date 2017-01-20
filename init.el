@@ -448,6 +448,29 @@ file of a buffer in an external program."
          :publishing-function org-publish-attachment)
         ("interstylar" :components ("interstylar-src" "interstylar-static"))))
 
+(defun partition-list (list length)
+  (loop
+     while list
+     collect (subseq list 0 length)
+     do (setf list (nthcdr length list))))
+
+(defun get-hash-keys (table)
+  (let ((keys '()))
+    (maphash (lambda (k _) (push k keys)) table)
+    keys))
+
+(defun list->hash-table (alist)
+  (let ((out (make-hash-table :test 'equal)))
+    (dolist (elem (partition-list alist 2) out)
+      (puthash (car elem) (car (cdr elem)) out))
+    out))
+
+(defvar org-publish-project-alist-hash-table
+  (let ((out (make-hash-table :test 'equal)))
+    (dolist (elem org-publish-project-alist out)
+      (puthash (car elem) (list->hash-table (cdr elem)) out))
+    out))
+
 ;; Improve our blogging experience with Org-Jekyll. This code sets four
 ;; functions with corresponding key bindings:
 ;;
@@ -490,13 +513,14 @@ file of a buffer in an external program."
       (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\"")
     s))
 
-(defun jekyll-draft-post (jekyll-directory title description)
+(defun jekyll-draft-post (project title description)
   "Create a new Jekyll blog post."
   (interactive
-   (list (read-directory-name "Target project directory: ")
+   (list (completing-read "Target project: " (get-hash-keys org-publish-project-alist-hash-table))
 	 (read-string "Post Title: ")
 	 (read-string "Post Description: ")))
-  (let ((draft-file (concat jekyll-directory jekyll-drafts-dir
+  (let ((draft-file (concat (gethash :base-directory (gethash project org-publish-project-alist-hash-table))
+			    jekyll-drafts-dir
 			    (jekyll-make-slug title)
 			    jekyll-post-ext))
 	(current-time (format-time-string "%Y-%m-%d %H:%M:%S")))

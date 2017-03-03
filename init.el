@@ -590,7 +590,7 @@ file of a buffer in an external program."
 (setq org-src-preserve-indentation t)
 
 (defvar my/org-babel-evaluated-languages
-  '(emacs-lisp clojure R python)
+  '(emacs-lisp clojure R python dot)
   "List of languages that may be evaluated in Org documents")
 
 (org-babel-do-load-languages

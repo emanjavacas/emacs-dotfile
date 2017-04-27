@@ -168,6 +168,9 @@ file of a buffer in an external program."
 ;;; Save desktop on exit
 (desktop-save-mode 1)
 
+;;; Don't break hard-links
+(setq backup-by-copying-when-linked t)
+
 ;; Don't show startup screen
 (setq inhibit-startup-screen t)
 

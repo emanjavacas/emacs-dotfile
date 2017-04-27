@@ -733,3 +733,6 @@ file of a buffer in an external program."
 
 ;;; Octave
 (add-to-list 'auto-mode-alist '("\\.m\\'" . octave-mode))
+
+;;; Txt
+(add-hook 'text-mode-hook 'wc-mode)

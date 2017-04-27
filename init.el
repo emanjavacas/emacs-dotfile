@@ -45,8 +45,7 @@
  ;; If there is more than one, they won't work right.
  )
 
-(add-to-list 'package-archives
-	     '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utils
@@ -57,15 +56,17 @@
 
 (defun my/->mode-hook (name)
   "Turn mode name into hook symbol"
-  (intern (replace-regexp-in-string "\\(-mode\\)?\\(-hook\\)?$"
-                                    "-mode-hook"
-                                    (my/->string name))))
+  (intern (replace-regexp-in-string
+	   "\\(-mode\\)?\\(-hook\\)?$"
+	   "-mode-hook"
+	   (my/->string name))))
 
 (defun my/->mode (name)
   "Turn mode name into mode symbol"
-  (intern (replace-regexp-in-string "\\(-mode\\)?$"
-                                    "-mode"
-                                    (my/->string name))))
+  (intern (replace-regexp-in-string
+	   "\\(-mode\\)?$"
+	   "-mode"
+	   (my/->string name))))
 
 (defun my/set-modes (arg mode-list)
   (dolist (m mode-list)
@@ -330,8 +331,7 @@ file of a buffer in an external program."
               'highlight-parentheses))
 
 (dolist (mode (mapcar 'my/->mode-hook my/lisps))
-  (add-hook mode
-            'my/general-lisp-hooks))
+  (add-hook mode 'my/general-lisp-hooks))
 
 (eval-after-load 'paredit
   '(progn

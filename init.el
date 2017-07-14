@@ -660,6 +660,7 @@ file of a buffer in an external program."
 ;;; Webdev
 (require 'nodejs-repl)
 (add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
+(add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
 (add-hook 'js-mode-hook 'js2-minor-mode)
 (add-hook 'js-mode-hook 'autopair-mode)
 (add-hook 'js2-mode-hook 'ac-js2-mode)
@@ -667,12 +668,6 @@ file of a buffer in an external program."
 
 (require 'flycheck)
 (add-hook 'js-mode-hook (lambda () (flycheck-mode t)))
-
-;;; Tern
-(add-to-list 'load-path "/home/enrique/code/js/tern/emacs/")
-(autoload 'tern-mode "tern.el" nil t)
-
-(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
 
 ;;; HTML
 (add-hook 'html-mode-hook 'autopair-mode)

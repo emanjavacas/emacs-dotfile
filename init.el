@@ -37,7 +37,7 @@
  '(org-latex-create-formula-image-program (quote imagemagick))
  '(org-latex-table-caption-above nil)
  '(python-shell-interpreter "ipython")
- '(python-shell-interpreter-args "-i"))
+ '(python-shell-interpreter-args "-i --simple-prompt"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -394,7 +394,7 @@ file of a buffer in an external program."
 (elpy-use-ipython)
 (setq python-remove-cwd-from-path nil)
 (setq python-shell-interpreter "/home/enrique/.pyenv/shims/ipython"
-      python-shell-interpreter-args "--simple-prompt -i")
+      python-shell-interpreter-args "--simple-prompt -i" "-i")
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Org-Mode

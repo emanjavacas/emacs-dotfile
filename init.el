@@ -393,7 +393,7 @@ file of a buffer in an external program."
 (elpy-enable)
 (elpy-use-ipython)
 (setq python-remove-cwd-from-path nil)
-(setq python-shell-interpreter "/home/enrique/.pyenv/shims/ipython"
+(setq python-shell-interpreter "/home/manjavacas/.pyenv/shims/ipython"
       python-shell-interpreter-args "--simple-prompt -i" "-i")
 
 ;;;;;;;;;;;;;;;;;;;;
@@ -406,7 +406,7 @@ file of a buffer in an external program."
 
 ;;; Presentations
 (require 'ox-reveal)
-(setq org-reveal-root "file:///home/enrique/.emacs.d/lisp/reveal.js-3.1.0/")
+(setq org-reveal-root "file:///home/manjavacas/.emacs.d/lisp/reveal.js-3.1.0/")
 (add-to-list 'load-path "~/.emacs.d/lisp/org-html5presentation.el")
 (require 'ox-html5presentation)
 
@@ -651,7 +651,7 @@ file of a buffer in an external program."
 
 ;;; (helm)-BIBTEX
 (autoload 'helm-bibtex "helm-bibtex" "" t)
-(setq helm-bibtex-bibliography '("/home/enrique/Documents/texts/bib/library.bib"))
+(setq helm-bibtex-bibliography '("/home/manjavacas/Documents/texts/bib/library.bib"))
 
 ;;; LATEX
 (setq latex-run-command "pdflatex")

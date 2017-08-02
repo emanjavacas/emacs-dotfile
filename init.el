@@ -29,15 +29,12 @@
  '(custom-safe-themes
    (quote
     ("6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default)))
- '(eclim-eclipse-dirs (quote ("~/eclipse")))
- '(eclim-executable "~/eclipse/eclim")
  '(httpd-port 8082)
  '(js2-basic-offset 2)
  '(js2-bounce-indent-p nil)
  '(org-latex-create-formula-image-program (quote imagemagick))
- '(org-latex-table-caption-above nil)
- '(python-shell-interpreter "ipython")
- '(python-shell-interpreter-args "-i --simple-prompt"))
+ '(org-latex-table-caption-above nil))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -189,6 +186,7 @@ file of a buffer in an external program."
 (setq password-cache-expiry nil)
 (global-hl-line-mode 1)
 (global-auto-revert-mode t)
+(setq ring-bell-function 'ignore)
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; KEYSTROKES
@@ -381,20 +379,24 @@ file of a buffer in an external program."
 ;;;;;;;;;;;;;;;;;;;;
 ;; Python
 (require 'package)
-(add-to-list 'package-archives '("elpy" . "https://jorgenschaefer.github.io/packages/"))
 (require 'nose)
+(add-to-list 'package-archives '("elpy" . "https://jorgenschaefer.github.io/packages/"))
 (add-hook 'python-mode-hook
 	  (lambda ()
+	    (pyenv-mode)
 	    (nose-mode t)
 	    (autopair-mode t)
 	    (setq autopair-handle-action-fns
 		  (list #'autopair-default-handle-action
 			#'autopair-python-triple-quote-action))))
 (elpy-enable)
+(exec-path-from-shell-copy-env "PYTHONPATH")
+(exec-path-from-shell-copy-env "PATH")
+(exec-path-from-shell-copy-env "LD_LIBRARY_PATH")
 (elpy-use-ipython)
 (setq python-remove-cwd-from-path nil)
 (setq python-shell-interpreter "/home/manjavacas/.pyenv/shims/ipython"
-      python-shell-interpreter-args "--simple-prompt -i" "-i")
+      python-shell-interpreter-args "--simple-prompt -i")
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Org-Mode

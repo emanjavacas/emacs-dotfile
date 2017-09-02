@@ -408,9 +408,10 @@ file of a buffer in an external program."
 
 ;;; Presentations
 (require 'ox-reveal)
-(setq org-reveal-root "file:///home/manjavacas/.emacs.d/lisp/reveal.js-3.1.0/")
-(add-to-list 'load-path "~/.emacs.d/lisp/org-html5presentation.el")
-(require 'ox-html5presentation)
+(setq org-reveal-root "file:///home/manjavacas/.emacs.d/lisp/reveal.js/")
+(setq org-reveal-external-plugins
+      '((toc-progress . "{src: 'file:///home/manjavacas/.emacs.d/list/reveal.js/plugin/toc-progress/toc-progress.js', async: true, callback: function() { toc_progress.initialize(); toc_progress.create(); }}")
+	))
 
 ;;; Blogging
 (require 'ox-publish)
@@ -418,23 +419,6 @@ file of a buffer in an external program."
 
 (setq org-publish-project-alist
       '(
-        ;; blog directory
-	("org-quique"
-         :base-directory "~/blog/org/"
-         :base-extension "org"
-         :publishing-directory "~/blog/emanjavacas.github.io/"
-         :recursive t
-         :publishing-function org-html-publish-to-html 
-         :headline-levels 4
-         :html-extension "html"
-         :body-only t)  ;; Only export section between <body> </body>
-        ("org-static-quique"
-         :base-directory "~/blog/org/" 
-         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|php" 
-         :publishing-directory "~/blog/emanjavacas.github.io/" 
-         :recursive t
-         :publishing-function org-publish-attachment)
-        ("blog" :components ("org-quique" "org-static-quique"))
         ;; interstylar directory
         ("interstylar-src"
          :base-directory "~/Documents/interstylar/org/" 

@@ -369,25 +369,47 @@ file of a buffer in an external program."
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Python
-(require 'package)
-(require 'nose)
-(add-to-list 'package-archives '("elpy" . "https://jorgenschaefer.github.io/packages/"))
-(add-hook 'python-mode-hook
-	  (lambda ()
-	    (pyenv-mode)
-	    (nose-mode t)
-	    (autopair-mode t)
-	    (setq autopair-handle-action-fns
-		  (list #'autopair-default-handle-action
-			#'autopair-python-triple-quote-action))))
-(elpy-enable)
+(use-package python
+  :mode ("\\.py\\'" . python-mode)
+  :interpreter ("python" . python-mode)
+  :config
+  (add-hook 'python-mode-hook 'smartparens-mode)
+  (add-hook 'python-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'python-mode-hook 'company-mode)
+  (add-hook 'python-mode-hook 'yas-minor-mode)
+  (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
+  (add-hook 'python-mode-hook 'anaconda-mode)
+  (add-hook 'python-mode-hook 'pyenv-mode)
+
+  (require 'flycheck-pyflakes)
+  (add-hook 'python-mode-hook 'flycheck-mode)
+  ;; (add-to-list 'flycheck-disabled-checkers 'python-flake8)
+  ;; (add-to-list 'flycheck-disabled-checkers 'python-pylint)
+
+  (setq warning-suppress-types '((python) (emacs)))
+  
+  (use-package anaconda-mode
+    :ensure t
+    :bind ("C-c C-d" . anaconda-mode-show-doc)
+    :config
+    (setq python-shell-interpreter "/home/manjavacas/.pyenv/shims/ipython"
+	  python-shell-interpreter-args "--simple-prompt -i"
+	  python-remove-cwd-from-path nil))
+
+  (use-package company-anaconda
+    :ensure t
+    :init
+    (eval-after-load "company"
+      '(add-to-list 'company-backends '(company-anaconda :with company-capf))))
+
+  (use-package highlight-indent-guides
+    :ensure t
+    :config
+    (setq highlight-indent-guides-method 'character)))
+
 (exec-path-from-shell-copy-env "PYTHONPATH")
 (exec-path-from-shell-copy-env "PATH")
 (exec-path-from-shell-copy-env "LD_LIBRARY_PATH")
-(elpy-use-ipython)
-(setq python-remove-cwd-from-path nil)
-(setq python-shell-interpreter "/home/manjavacas/.pyenv/shims/ipython"
-      python-shell-interpreter-args "--simple-prompt -i")
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Org-Mode

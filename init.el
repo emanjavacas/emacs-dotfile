@@ -702,3 +702,20 @@ file of a buffer in an external program."
 
 ;;; Txt
 (add-hook 'text-mode-hook 'wc-mode)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(global-linum-mode t)
+ '(line-number-mode nil)
+ '(package-selected-packages
+   (quote
+    (sml-mode smartparens flycheck-pyflakes use-package company-anaconda zenburn-theme wrap-region rainbow-delimiters pyenv-mode projectile pallet ox-reveal org-link-minor-mode nose nodejs-repl magit highlight-parentheses flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell elpy clj-refactor autopair anaconda-mode ac-cider))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(linum ((t (:background "#3F3F3F" :foreground "dark gray")))))

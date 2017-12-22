@@ -1,5 +1,17 @@
 ;; /This/ file (~init.el~) that you are reading
 ;; should be in this folder
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+(package-refresh-contents)
+
+(add-to-list
+ 'package-archives
+ '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
+
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 ;; Package Manager
@@ -14,62 +26,9 @@
 (require 'pallet)
 
 ;; Root directory
-(setq root-dir (file-name-directory
-                (or (buffer-file-name) load-file-name)))
+(setq root-dir (file-name-directory (or (buffer-file-name) load-file-name)))
 
 (ido-mode t)
-
-;; CUSTOM
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(csv-separators (quote (";" "	")) t)
- '(custom-safe-themes
-   (quote
-    ("40f6a7af0dfad67c0d4df2a1dd86175436d79fc69ea61614d668a635c2cd94ab" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" default)))
- '(fci-rule-color "#383838" t)
- '(httpd-port 8082 t)
- '(js2-basic-offset 2 t)
- '(js2-bounce-indent-p nil t)
- '(nrepl-message-colors
-   (quote
-    ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
- '(org-latex-create-formula-image-program (quote imagemagick))
- '(org-latex-table-caption-above nil t)
- '(org-preview-latex-default-process (quote imagemagick))
- '(vc-annotate-background "#2B2B2B" t)
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#BC8383")
-     (40 . "#CC9393")
-     (60 . "#DFAF8F")
-     (80 . "#D0BF8F")
-     (100 . "#E0CF9F")
-     (120 . "#F0DFAF")
-     (140 . "#5F7F5F")
-     (160 . "#7F9F7F")
-     (180 . "#8FB28F")
-     (200 . "#9FC59F")
-     (220 . "#AFD8AF")
-     (240 . "#BFEBBF")
-     (260 . "#93E0E3")
-     (280 . "#6CA0A3")
-     (300 . "#7CB8BB")
-     (320 . "#8CD0D3")
-     (340 . "#94BFF3")
-     (360 . "#DC8CC3"))) t)
- '(vc-annotate-very-old-color "#DC8CC3" t))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
-(add-to-list 'package-archives '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utils
@@ -190,6 +149,14 @@ file of a buffer in an external program."
 (load-theme 'zenburn t)
 (set-cursor-color "firebrick")
 
+;;; Font
+(set-default-font "DejaVuSansMono 12")
+
+;;; Linum (display line numbers)
+(require 'linum-highlight-current-line-number)
+(global-linum-mode t)
+(setq linum-format 'linum-highlight-current-line-number)
+
 ;;; Save desktop on exit
 (desktop-save-mode 1)
 
@@ -208,6 +175,8 @@ file of a buffer in an external program."
   "Prevent 'y-or-n-p' from activating a dialog."
   (let ((use-dialog-box nil))
     ad-do-it))
+
+(toggle-scroll-bar -1)
 
 ;;; Misc
 (setq password-cache-expiry nil)
@@ -271,11 +240,6 @@ file of a buffer in an external program."
                      (0 (progn (compose-region (match-beginning 1) (match-end 1)
                                                ,(make-char 'greek-iso8859-7 107))
                                nil)))))))
-;; modeline
-;; (sml/setup)
-;; (sml/apply-theme 'dark)
-;; (setq sml/shorten-directory t)
-;; (setq sml/shorten-modes t)
 
 ;; Scrolling
 (setq redisplay-dont-pause t
@@ -605,32 +569,18 @@ file of a buffer in an external program."
 ;;; For languages with significant whitespace like Python:
 (setq org-src-preserve-indentation t)
 
-(defvar my/org-babel-evaluated-languages
-  '(emacs-lisp clojure R python dot)
-  "List of languages that may be evaluated in Org documents")
-
 (org-babel-do-load-languages
  'org-babel-load-languages
- (mapcar (lambda (lang)
-           (cons lang t))
-         my/org-babel-evaluated-languages))
+ '((emacs-lisp . t)
+   (clojure . t)
+   (python . t)))
 
 (require 'ob-clojure)
 (setq org-babel-clojure-backend 'cider)
 
-;;; Diagramming
-(add-to-list 'org-src-lang-modes (quote ("dot" . graphviz-dot)))
-(add-to-list 'my/org-babel-evaluated-languages 'dot)
-(add-to-list 'my/org-babel-evaluated-languages 'plantuml)
-(put 'downcase-region 'disabled nil)
-
 ;;;;;;;;;;;;;;;;;;;;
 ;; Ess (Emacs speaks statistics)
 (setq ess-ask-for-ess-directory nil)
-
-;;;;;;;;;;;;;;;;;;;;
-;;; Tramp
-;; (setq tramp-default-method "ssh")
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; LATEX
@@ -645,7 +595,6 @@ file of a buffer in an external program."
 (setq reftex-plug-into-AUCTeX t)
 (setq TeX-PDF-mode t)
  
-;; Use Skim as viewer, enable source <-> PDF sync
 ;; make latexmk available via C-c C-c
 ;; Note: SyncTeX is setup via ~/.latexmkrc (see below)
 (add-hook 'LaTeX-mode-hook (lambda ()
@@ -654,13 +603,6 @@ file of a buffer in an external program."
       :help "Run latexmk on file")
     TeX-command-list)))
 (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "latexmk")))
- 
-;; use Skim as default pdf viewer
-;; Skim's displayline is used for forward search (from .tex to .pdf)
-;; option -b highlights the current line; option -g opens Skim in the background  
-;; (setq TeX-view-program-selection '((output-pdf "PDF Viewer")))
-;; (setq TeX-view-program-list
-;;       '(("PDF Viewer" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
 
 ;;; (helm)-BIBTEX
 (autoload 'helm-bibtex "helm-bibtex" "" t)
@@ -698,7 +640,6 @@ file of a buffer in an external program."
 	     '(nxml-mode
 	       "<!--\\|<[^/>]*[^/]>"
                "-->\\|</[^/>]*[^/]>"
-
                "<!--"
                sgml-skip-tag-forward
                nil))
@@ -723,11 +664,6 @@ file of a buffer in an external program."
             (if (called-interactively-p t)
                 (message "/%s" (mapconcat 'identity path "/"))
               (format "/%s" (mapconcat 'identity path "/")))))))
-
-;;; Java
-(require 'eclim)
-(require 'eclimd)
-(global-eclim-mode)
 
 ;;; Markdown
 (defun markdown-html (buffer)

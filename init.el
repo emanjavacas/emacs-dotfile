@@ -316,9 +316,8 @@ file of a buffer in an external program."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Yasnippet
-(require 'yasnippet)
 (add-to-list 'load-path "~/.emacs.d/plugins/yasnippet")
-(setq yas-snippet-dirs '("~/.emacs.d/plugins/yasnippet/snippets"))
+(require 'yasnippet)
 (yas-global-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

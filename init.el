@@ -30,6 +30,19 @@
 
 (ido-mode t)
 
+(ivy-mode 1)
+(use-package ivy :demand
+	     :config
+	     (setq ivy-use-virtual-buffers t
+		   ivy-count-format "%d/%d ")
+	     (bind-keys
+	      :map ivy-minibuffer-map
+	      ("C-m" . ivy-alt-done)
+	      ("C-j" . ivy-done)
+	      ("C-S-m" . ivy-immediate-done)
+	      ("C-t"   . ivy-toggle-fuzzy)))
+(use-package smex)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utils
 (defun my/->string (str)
@@ -157,6 +170,9 @@ file of a buffer in an external program."
 (global-linum-mode t)
 (setq linum-format 'linum-highlight-current-line-number)
 
+;;; Left margin width
+(fringe-mode '(10 . 0))
+
 ;;; Save desktop on exit
 (desktop-save-mode 1)
 
@@ -183,6 +199,10 @@ file of a buffer in an external program."
 (global-hl-line-mode 1)
 (global-auto-revert-mode t)
 (setq ring-bell-function 'ignore)
+
+;;; Scratch
+(setq initial-major-mode 'markdown-mode)
+(setq initial-scratch-message "Welcome to scratch!")
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; KEYSTROKES
@@ -345,7 +365,7 @@ file of a buffer in an external program."
   have a CIDER REPL connection"
   (eldoc-mode)
   (company-mode)
- (ac-cider-popup-doc))
+  (ac-cider-popup-doc))
 
 (add-hook 'cider-mode-hook 'my/cider-mode-hooks)
 
@@ -359,60 +379,45 @@ file of a buffer in an external program."
 (add-hook 'clojure-mode-hook 'my/clojure-mode-hooks)
 
 (defun my/cider-repl-mode-hooks ()
-  (my/turn-on 'paredit
-              'rainbow-delimiters
-              'highlight-parentheses
-              'subword)
+  (my/turn-on 'paredit 'rainbow-delimiters 'highlight-parentheses 'subword)
   (company-mode))
 
 (add-hook 'cider-repl-mode-hook 'my/cider-repl-mode-hooks)
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Python
-(use-package python
-  :mode ("\\.py\\'" . python-mode)
-  :interpreter ("python" . python-mode)
-  :config
-  (add-hook 'python-mode-hook 'smartparens-mode)
-  (add-hook 'python-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'python-mode-hook 'company-mode)
-  (add-hook 'python-mode-hook 'yas-minor-mode)
-  (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
-  (add-hook 'python-mode-hook 'anaconda-mode)
-  (add-hook 'python-mode-hook 'pyenv-mode)
+(defun autopair-hook ()
+  (autopair-mode t)
+  (setq autopair-handle-action-fns
+	(list #'autopair-default-handle-action
+	      #'autopair-python-triple-quote-action)))
 
-  (require 'flycheck-pyflakes)
-  (add-hook 'python-mode-hook 'flycheck-mode)
-  ;; (add-to-list 'flycheck-disabled-checkers 'python-flake8)
-  ;; (add-to-list 'flycheck-disabled-checkers 'python-pylint)
+(defun my/python-mode-hooks ()
+  (smartparens-mode)
+  (rainbow-delimiters-mode)
+  (yas-minor-mode)
+  ;; (highlight-indent-guides-mode)
+  (pyenv-mode)
+  ;; (autopair-hook)
+  (setq python-remove-cwd-from-path nil)
+  (setq python-shell-interpreter "/home/manjavacas/.pyenv/shims/ipython")
+  (setq python-shell-interpreter-args "--simple-prompt -i"))
 
-  (setq warning-suppress-types '((python) (emacs)))
-  
-  (use-package anaconda-mode
-    :ensure t
-    :bind ("C-c C-d" . anaconda-mode-show-doc)
-    :config
-    (setq python-shell-interpreter "/home/manjavacas/.pyenv/shims/ipython"
-	  python-shell-interpreter-args "--simple-prompt -i"
-	  python-remove-cwd-from-path nil))
+(add-hook 'python-mode-hook 'my/python-mode-hooks)
 
-  (use-package company-anaconda
-    :ensure t
-    :init
-    (eval-after-load "company"
-      '(add-to-list 'company-backends '(company-anaconda :with company-capf))))
-
-  (use-package highlight-indent-guides
-    :ensure t
-    :config
-    (setq highlight-indent-guides-method 'character)))
-
+(elpy-enable)
 (exec-path-from-shell-copy-env "PYTHONPATH")
 (exec-path-from-shell-copy-env "PATH")
 (exec-path-from-shell-copy-env "LD_LIBRARY_PATH")
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Org-Mode
+
+;;; Make windmove work in org-mode:
+(add-hook 'org-shiftup-final-hook 'windmove-up)
+(add-hook 'org-shiftleft-final-hook 'windmove-left)
+(add-hook 'org-shiftdown-final-hook 'windmove-down)
+(add-hook 'org-shiftright-final-hook 'windmove-right)
 
 ;;; Easy templates
 (require 'org)
@@ -610,20 +615,22 @@ file of a buffer in an external program."
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)
 (setq-default TeX-master nil)
-(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-(setq reftex-plug-into-AUCTeX t)
-(setq TeX-PDF-mode t)
- 
-;; make latexmk available via C-c C-c
-;; Note: SyncTeX is setup via ~/.latexmkrc (see below)
-(add-hook 'LaTeX-mode-hook (lambda ()
+
+(defun my/LaTeX-mode-hooks ()
+  (visual-line-mode)
+  (flyspell-mode)
+  (LaTeX-math-mode)
+  (turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t)
+  (setq TeX-PDF-mode t)
   (push
-    '("latexmk" "latexmk -synctex=1 -pdf %s" TeX-run-TeX nil t
-      :help "Run latexmk on file")
-    TeX-command-list)))
+   '("latexmk" "latexmk -synctex=1 -pdf %s" TeX-run-TeX nil t
+     :help "Run latexmk on file")
+   TeX-command-list))
+ 
+;; Make latexmk available via C-c C-c
+;; Note: SyncTeX is setup via ~/.latexmkrc (see below)
+(add-hook 'LaTeX-mode-hook 'my/LaTeX-mode-hooks)
 (add-hook 'TeX-mode-hook '(lambda () (setq TeX-command-default "latexmk")))
 
 ;;; (helm)-BIBTEX
@@ -636,15 +643,48 @@ file of a buffer in an external program."
 ;;;;;;;;;;;;;;;;;;;;;
 ;;; Webdev
 (require 'nodejs-repl)
-(add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
+(require 'js2-mode)
+(require 'js2-refactor)
+(add-to-list 'auto-mode-alist '("\\.json\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-(add-hook 'js-mode-hook 'js2-minor-mode)
-(add-hook 'js-mode-hook 'autopair-mode)
-(add-hook 'js2-mode-hook 'ac-js2-mode)
-(setq js2-highlight-level 3)
 
-(require 'flycheck)
-(add-hook 'js-mode-hook (lambda () (flycheck-mode t)))
+(defun my/js2-mode-hooks ()
+  ;; CONFIG
+  (setq js2-highlight-level 3)
+  (setq js-indent-level 2) ;; for some reason js2-indent-level ain't working
+
+  (set (make-local-variable 'comment-start) "/**")
+  (set (make-local-variable 'comment-end) "*/")
+
+  ;; MINOR MODES
+  (smartparens-mode)
+  (rainbow-delimiters-mode)
+  (highlight-parentheses-mode)
+  (js2-imenu-extras-mode)
+  (js2-highlight-vars-mode)
+  (flycheck-mode t)
+
+  ;; TERN
+  (add-to-list 'company-backends 'company-tern)
+  (tern-mode)
+  (company-mode)
+
+  ;; REFACTOR
+  (js2-refactor-mode)
+
+  ;; XREF-JS2-MODE
+  ;; Goto functionality
+  ;; M-. Jump to definition
+  ;; M-? Jump to references
+  ;; (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)
+  ;; bind C-k to kill (similar to paredit)
+  ;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+  ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref
+  ;; (define-key js-mode-map (kbd "M-.") nil)
+  )
+
+(add-hook 'js2-mode-hook 'my/js2-mode-hooks)
 
 ;;; HTML
 (add-hook 'html-mode-hook 'autopair-mode)
@@ -710,12 +750,14 @@ file of a buffer in an external program."
  ;; If there is more than one, they won't work right.
  '(global-linum-mode t)
  '(line-number-mode nil)
+ '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (sml-mode smartparens flycheck-pyflakes use-package company-anaconda zenburn-theme wrap-region rainbow-delimiters pyenv-mode projectile pallet ox-reveal org-link-minor-mode nose nodejs-repl magit highlight-parentheses flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell elpy clj-refactor autopair anaconda-mode ac-cider))))
+    (ess smex counsel undo-tree epresent web-mode rjsx-mode company-tern rainbow-delimiters xref-js2 js2-refactor js2-highlight-vars js2-mode latex-math-preview latex-preview-pane company-jedi wc-mode markdown-mode+ markdown-mode git-timemachine git sml-mode smartparens flycheck-pyflakes use-package company-anaconda zenburn-theme wrap-region pyenv-mode projectile pallet ox-reveal org-link-minor-mode nose nodejs-repl magit highlight-parentheses flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell elpy clj-refactor autopair anaconda-mode ac-cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(linum ((t (:background "#3F3F3F" :foreground "dark gray")))))
+ '(flycheck-error ((t (:underline "#BC8383"))))
+ '(linum ((t (:background "gray31" :foreground "dim gray")))))

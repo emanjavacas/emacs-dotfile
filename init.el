@@ -159,7 +159,8 @@ file of a buffer in an external program."
 ;;;;;;;;;;;;;;;;;;;;
 ;; Theme
 ;; https://github.com/bbatsov/zenburn-emacs
-(load-theme 'zenburn t)
+(load-theme 'zenburn t)			;inherit missing color from zenburn
+(load-theme 'dracula t)
 (set-cursor-color "firebrick")
 
 ;;; Font
@@ -752,11 +753,11 @@ file of a buffer in an external program."
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (ess smex counsel undo-tree epresent web-mode rjsx-mode company-tern rainbow-delimiters xref-js2 js2-refactor js2-highlight-vars js2-mode latex-math-preview latex-preview-pane company-jedi wc-mode markdown-mode+ markdown-mode git-timemachine git sml-mode smartparens flycheck-pyflakes use-package company-anaconda zenburn-theme wrap-region pyenv-mode projectile pallet ox-reveal org-link-minor-mode nose nodejs-repl magit highlight-parentheses flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell elpy clj-refactor autopair anaconda-mode ac-cider))))
+    (molokai-theme sublime-themes spacemacs-theme dracula-theme ess smex counsel undo-tree epresent web-mode rjsx-mode company-tern rainbow-delimiters xref-js2 js2-refactor js2-highlight-vars js2-mode latex-math-preview latex-preview-pane company-jedi wc-mode markdown-mode+ markdown-mode git-timemachine git sml-mode smartparens flycheck-pyflakes use-package company-anaconda zenburn-theme wrap-region pyenv-mode projectile pallet ox-reveal org-link-minor-mode nose nodejs-repl magit highlight-parentheses flycheck-pos-tip flycheck-clojure flx-ido exec-path-from-shell elpy clj-refactor autopair anaconda-mode ac-cider))))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(flycheck-error ((t (:underline "#BC8383"))))
- '(linum ((t (:background "gray31" :foreground "dim gray")))))
+ )

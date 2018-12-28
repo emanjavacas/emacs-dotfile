@@ -251,6 +251,7 @@ file of a buffer in an external program."
 ;; Remove clutter
 (when (window-system)
   (tool-bar-mode -1)
+  (menu-bar-mode -1)
   (scroll-bar-mode -1))
 
 ;; Pretty lambdas
